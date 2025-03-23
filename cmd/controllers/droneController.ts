@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import ResponseUtility from '../utils/response';
 import { asyncHandler } from "../middlewares/errorHandler";
+import { generateDroneSerialNumber } from "../utils/generateSerialNumber";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +11,7 @@ export const CreateDrone = asyncHandler(async (req: Request, res: Response): Pro
 
     const drone = await prisma.drone.create({
         data: {
-            serialNumber: `Drone-${Math.floor(Math.random() * 1000000)}`,
+            serialNumber: generateDroneSerialNumber(),
             model: model,
             weightLimit: weightLimit,
             batteryCapacity: batteryCapacity,

@@ -8,7 +8,8 @@
     "lint": "eslint --ext .ts cmd/",
     "dev": "ts-node-dev cmd/server.ts",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:status": "prisma migrate status"
   },
   "keywords": [],
   "author": "",

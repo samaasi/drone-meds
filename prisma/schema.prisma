@@ -21,6 +21,16 @@ model Drone {
   updatedAt       DateTime   @updatedAt
 }
 
+model Medicaton {
+  id        String   @id @default(cuid())
+  name      String
+  weight    Float
+  code      String   @unique
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum DroneModel {
   Lightweight
   Middleweight

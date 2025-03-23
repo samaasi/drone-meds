@@ -10,3 +10,11 @@ export const CreateDroneSchema: ValidationSchemas = {
         state: z.nativeEnum(DroneState),
     }),
 };
+
+export const LoadDroneMedicationSchema: ValidationSchemas = {
+    body: z.object({
+        medicationIds: z.array(
+            z.string().min(1, 'Medication ID is required')
+        ).min(1, 'Medication IDs must be a non-empty array')
+    }),
+};

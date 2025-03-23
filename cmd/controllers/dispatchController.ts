@@ -52,6 +52,89 @@ export const CheckDroneBatteryLevel = asyncHandler(async (req: Request, res: Res
     return ResponseUtility.success(res, drone);
 });
 
-// loading a drone with medication items
-// checking loaded medication items for a given drone
+/** loading a drone with medication items */
+export const LoadDroneWithMedication = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    const { medicationIds } = req.body;
+
+
+    const drone = await prisma.drone.findUnique({
+        where: { id },
+        select: { state: true, batteryCapacity: true, weightLimit: true },
+    });
+
+    if (!drone) {
+        return ResponseUtility.error(res, 404, 'Drone not found');
+    }
+
+    if (drone.state !== DroneState.IDLE && drone.state !== DroneState.LOADING) {
+        return ResponseUtility.error(res, 400, `Cannot load drone in "${drone.state}" state`);
+    }
+
+    if (drone.batteryCapacity < 25) {
+        return ResponseUtility.error(res, 400, `Battery level too low (${drone.batteryCapacity}%)`);
+    }
+
+    const medications = await prisma.medication.findMany({
+        where: {
+            id: { in: medicationIds },
+            Delivery: null,
+        },
+    });
+
+    if (medications.length !== medicationIds.length) {
+        return ResponseUtility.error(res, 400, "Some medications are invalid or already loaded");
+    }
+
+    const totalWeight = medications.reduce((sum, med) => sum + med.weight, 0);
+    if (totalWeight > drone.weightLimit) {
+        return ResponseUtility.error(res, 400, `Total weight (${totalWeight}gr) exceeds drone limit (${drone.weightLimit}gr)`);
+    }
+
+    const [delivery] = await prisma.$transaction([
+        prisma.delivery.create({
+            data: {
+                droneId: id,
+                medications: {
+                    connect: medicationIds.map((id: string) => ({ id })),
+                },
+            },
+            include: {
+                medications: true,
+            },
+        }),
+        prisma.drone.update({
+            where: { id },
+            data: { state: DroneState.LOADED },
+        }),
+    ]);
+
+    return ResponseUtility.success(res, delivery, 201, "Medications loaded successfully");
+});
+
+/** checking loaded medication items for a given drone */
+export const CheckDroneLoadedMedication = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+
+    const drone = await prisma.drone.findUnique({
+        where: { id },
+        include: {
+            Delivery: {
+                include: {
+                    medications: true,
+                },
+            },
+        },
+    });
+
+    if (!drone) {
+        return ResponseUtility.error(res, 404, "Drone not found.");
+    }
+
+    const medications = drone.Delivery.flatMap(
+        delivery => delivery.medications
+    );
+
+    return ResponseUtility.success(res, medications);
+});
 

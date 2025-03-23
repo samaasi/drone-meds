@@ -1,4 +1,4 @@
-import ResponseUtility from "./response";
+import ResponseUtility from "../utils/response";
 import { AnyZodObject, ZodError } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 

@@ -21,7 +21,7 @@ model Drone {
   updatedAt       DateTime   @updatedAt
 }
 
-model Medicaton {
+model Medication {
   id        String   @id @default(cuid())
   name      String
   weight    Float

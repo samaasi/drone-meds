@@ -38,7 +38,18 @@ export const GetAvailableDrones = asyncHandler(async (req: Request, res: Respons
 
 /** check drone battery level for a given drone */
 export const CheckDroneBatteryLevel = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    //
+    const { id } = req.params;
+
+    const drone = await prisma.drone.findUnique({
+        where: { id },
+        select: { serialNumber: true, batteryCapacity: true },
+    });
+
+    if (!drone) {
+        return ResponseUtility.error(res, 404, 'Drone not found');
+    }
+
+    return ResponseUtility.success(res, drone);
 });
 
 // loading a drone with medication items

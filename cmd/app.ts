@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // Load routes
-app.use('/api', droneRoutes);
+app.use('/api/v1', droneRoutes);
 
 app.use(errorHandler);
 

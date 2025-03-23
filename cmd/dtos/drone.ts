@@ -1,6 +1,8 @@
+import { DroneModel, DroneState } from "@prisma/client"
+
 export interface DroneDTO {
-    model: 'Lightweight' | 'Middleweight' | 'Cruiserweight' | 'Heavyweight';
+    model: DroneModel;
     weightLimit: number;
     batteryCapacity: number;
-    state: 'IDLE' | 'LOADING' | 'LOADED' | 'DELIVERING' | 'DELIVERED' | 'RETURNING';
+    state: DroneState;
 }

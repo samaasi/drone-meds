@@ -9,3 +9,30 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Drone {
+  id              String     @id @default(cuid())
+  serialNumber    String     @unique
+  model           DroneModel
+  weightLimit     Float
+  batteryCapacity Float
+  state           DroneState
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+enum DroneModel {
+  Lightweight
+  Middleweight
+  Cruiserweight
+  Heavyweight
+}
+
+enum DroneState {
+  IDLE
+  LOADING
+  LOADED
+  DELIVERING
+  DELIVERED
+  RETURNING
+}

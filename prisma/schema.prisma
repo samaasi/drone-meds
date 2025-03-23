@@ -19,16 +19,28 @@ model Drone {
   state           DroneState
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+  Delivery        Delivery[]
 }
 
 model Medication {
-  id        String   @id @default(cuid())
-  name      String
-  weight    Float
-  code      String   @unique
-  image     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String    @id @default(cuid())
+  name       String
+  weight     Float
+  code       String    @unique
+  image      String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Delivery   Delivery? @relation(fields: [deliveryId], references: [id])
+  deliveryId String?
+}
+
+model Delivery {
+  id          String       @id @default(cuid())
+  droneId     String
+  drone       Drone        @relation(fields: [droneId], references: [id])
+  medications Medication[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 enum DroneModel {

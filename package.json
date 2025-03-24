@@ -2,18 +2,22 @@
   "name": "drone-meds",
   "version": "1.0.0",
   "description": "Drone dispatch system for medical supplies",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
+    "test": "jest",
+    "start": "node dist/server.js",
     "lint": "eslint --ext .ts cmd/",
     "dev": "ts-node-dev cmd/server.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "prisma:status": "prisma migrate status"
+    "prisma:status": "prisma migrate status",
+    "docker:build": "docker build -t drone-meds-service .",
+    "docker:run": "docker run -p 5005:5005 drone-meds-service"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["drone", "health", "medication", "dispatch", "medical", "supplies"],
+  "author": "bsamaasi",
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {

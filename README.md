@@ -50,7 +50,7 @@
     ```
 The application will be available at http://localhost:5005/api/v1
 
-## Running the application (Docker)
+## Running the application (Docker: source)
 
 1. Build the Docker image
    ```bash
@@ -61,6 +61,12 @@ The application will be available at http://localhost:5005/api/v1
    npm run docker:run
    ```
 Alternatively, you could pull from DockerHub:
+## Running the application (Docker: prebuilt)
+#### Using a Pre-built Image from Docker Hub
+   ```bash
+   docker pull bsamasi/drone-meds:latest
+   docker run -p 5005:5005 bsamasi/drone-meds:latest
+   ```
 
 ## Testing
 

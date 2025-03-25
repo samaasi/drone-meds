@@ -74,7 +74,7 @@ describe('Dispatch Controller', () => {
         jest.clearAllMocks();
         (createId as jest.Mock).mockReturnValue('mocked-cuid');
         (generateDroneSerialNumber as jest.Mock).mockReturnValue('DRN-ZRQAXYEBN96JNQ5');
-        (generateMedicationCode as jest.Mock).mockReturnValue('LISIN-75mg-TAB-PHB-BCC87F-25');
+        (generateMedicationCode as jest.Mock).mockReturnValue('IBUPR-400mg-SYR-WLL-8B5168-25');
     });
 
     afterEach(() => {
@@ -105,6 +105,31 @@ describe('Dispatch Controller', () => {
 
             expect(prisma.drone.create).toHaveBeenCalled();
             expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockDrone, 201, 'Drone registered successfully');
+        });
+    });
+
+    describe('CreateMedication', () => {
+        it('should create a new medication', async () => {
+            req.body = {
+                name: 'Ibuprofen',
+                weight: 400,
+                image: '/medications/ibuprofen.jpg'
+            };
+
+            const mockMedication = {
+                id: 'mocked-cuid',
+                name: 'Ibuprofen',
+                weight: 400,
+                code: 'IBUPR-400mg-SYR-WLL-8B5168-25',
+                image: '/medications/ibuprofen.jpg'
+            };
+
+            (prisma.medication.create as jest.Mock).mockResolvedValue(mockMedication);
+
+            await CreateMedication(req as Request, res as Response, next);
+
+            expect(prisma.medication.create).toHaveBeenCalled();
+            expect(ResponseUtility.created).toHaveBeenCalledWith(res, mockMedication, 201, 'Medication created successfully');
         });
     });
 

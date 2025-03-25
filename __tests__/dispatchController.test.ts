@@ -183,4 +183,28 @@ describe('Dispatch Controller', () => {
             expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockDrone, 200, 'Battery level retrieved successfully');
         });
     });
+
+    describe('CheckDroneLoadedMedication', () => {
+        it('should return loaded medications for a drone', async () => {
+            req.params = { id: 'cm8l3vesl0000w7qcmq1j' };
+
+            const mockDrone = {
+                Delivery: [
+                    {
+                        medications: [
+                            { id: 'cm8l9knny0006w7soxbtbwq85', name: 'Ibuprofen', weight: 400 },
+                            { id: 'cm8l9knmw0000w7sone638rji', name: 'Paracetamol', weight: 200 }
+                        ]
+                    }
+                ]
+            };
+
+            (prisma.drone.findUnique as jest.Mock).mockResolvedValue(mockDrone);
+
+            await CheckDroneLoadedMedication(req as Request, res as Response, next);
+
+            expect(prisma.drone.findUnique).toHaveBeenCalled();
+            expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockDrone.Delivery[0].medications, 200, 'Loaded medications retrieved successfully');
+        });
+    });
 });

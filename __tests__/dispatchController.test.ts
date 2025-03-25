@@ -1,24 +1,32 @@
 import prisma from '../cmd/utils/prisma';
 import { DroneState } from '@prisma/client';
+import { Request, Response } from 'express';
 import {
     CreateDrone,
+    CreateMedication,
+    GetAllMedications,
     GetAvailableDrones,
     CheckDroneBatteryLevel,
+    GetUnloadedMedications,
     LoadDroneWithMedication,
     CheckDroneLoadedMedication
 } from '../cmd/controllers/dispatchController';
+import { createId } from '@paralleldrive/cuid2';
 import ResponseUtility from '../cmd/utils/response';
-import { Request, Response, NextFunction } from 'express';
+import { generateMedicationCode } from '../cmd/utils/mediCode';
+import { generateDroneSerialNumber } from '../cmd/utils/generateSerialNumber';
 
 jest.mock('../cmd/utils/prisma', () => ({
     __esModule: true,
     default: {
         drone: {
             create: jest.fn(),
+            update: jest.fn(),
             findMany: jest.fn(),
             findUnique: jest.fn(),
         },
         medication: {
+            create: jest.fn(),
             findMany: jest.fn(),
         },
         $transaction: jest.fn(),
@@ -37,6 +45,18 @@ jest.mock('../cmd/utils/response', () => ({
     }
 }));
 
+jest.mock('@paralleldrive/cuid2', () => ({
+    createId: jest.fn()
+}));
+
+jest.mock('../cmd/utils/generateSerialNumber', () => ({
+    generateDroneSerialNumber: jest.fn()
+}));
+
+jest.mock('../cmd/utils/mediCode', () => ({
+    generateMedicationCode: jest.fn()
+}));
+
 describe('Dispatch Controller', () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
@@ -52,10 +72,40 @@ describe('Dispatch Controller', () => {
         next = jest.fn();
 
         jest.clearAllMocks();
+        (createId as jest.Mock).mockReturnValue('mocked-cuid');
+        (generateDroneSerialNumber as jest.Mock).mockReturnValue('DRN-ZRQAXYEBN96JNQ5');
+        (generateMedicationCode as jest.Mock).mockReturnValue('LISIN-75mg-TAB-PHB-BCC87F-25');
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe('CreateDrone', () => {
+        it('should create a new drone', async () => {
+            req.body = {
+                model: 'Lightweight',
+                weightLimit: 500,
+                batteryCapacity: 100,
+                state: DroneState.IDLE
+            };
+
+            const mockDrone = {
+                id: 'mocked-cuid',
+                serialNumber: 'DRN-ZRQAXYEBN96JNQ5',
+                model: 'Lightweight',
+                weightLimit: 500,
+                batteryCapacity: 100,
+                state: DroneState.IDLE
+            };
+
+            (prisma.drone.create as jest.Mock).mockResolvedValue(mockDrone);
+
+            await CreateDrone(req as Request, res as Response, next);
+
+            expect(prisma.drone.create).toHaveBeenCalled();
+            expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockDrone, 201, 'Drone registered successfully');
+        });
     });
 
     describe('GetAvailableDrones', () => {

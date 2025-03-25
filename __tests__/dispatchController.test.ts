@@ -207,4 +207,36 @@ describe('Dispatch Controller', () => {
             expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockDrone.Delivery[0].medications, 200, 'Loaded medications retrieved successfully');
         });
     });
+
+    describe('GetAllMedications', () => {
+        it('should return all medications', async () => {
+            const mockMedications = [
+                { id: 'cm8l9knny0006w7soxbtbwq85', name: 'Ibuprofen', weight: 400 },
+                { id: 'cm8l9knmw0000w7sone638rji', name: 'Paracetamol', weight: 200 }
+            ];
+
+            (prisma.medication.findMany as jest.Mock).mockResolvedValue(mockMedications);
+
+            await GetAllMedications(req as Request, res as Response, next);
+
+            expect(prisma.medication.findMany).toHaveBeenCalled();
+            expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockMedications, 200, 'Medications retrieved successfully');
+        });
+    });
+
+    describe('GetUnloadedMedications', () => {
+        it('should return unloaded medications', async () => {
+            const mockMedications = [
+                { id: 'cm8l9knny0006w7soxbtbwq85', name: 'Ibuprofen', weight: 400 },
+                { id: 'cm8l9knmw0000w7sone638rji', name: 'Paracetamol', weight: 200 }
+            ];
+
+            (prisma.medication.findMany as jest.Mock).mockResolvedValue(mockMedications);
+
+            await GetUnloadedMedications(req as Request, res as Response, next);
+
+            expect(prisma.medication.findMany).toHaveBeenCalled();
+            expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockMedications, 200, 'Unloaded medications retrieved successfully');
+        });
+    });
 });

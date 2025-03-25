@@ -2,6 +2,7 @@ import prisma from "../utils/prisma";
 import { Request, Response } from "express";
 import { DroneState } from "@prisma/client";
 import ResponseUtility from "../utils/response";
+import { generateMedicationCode } from "../utils/mediCode";
 import { asyncHandler } from "../middlewares/errorHandler";
 import { generateDroneSerialNumber } from "../utils/generateSerialNumber";
 
@@ -137,4 +138,13 @@ export const CheckDroneLoadedMedication = asyncHandler(async (req: Request, res:
 
     return ResponseUtility.success(res, medications);
 });
+
+/** Out of scope functions */
+
+export const GetAllMedications = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const medications = await prisma.medication.findMany();
+
+    return ResponseUtility.success(res, medications, 200, "Medications retrieved successfully");
+});
+
 

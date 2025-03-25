@@ -20,7 +20,7 @@ export const CreateDrone = asyncHandler(async (req: Request, res: Response): Pro
         },
     });
 
-    return ResponseUtility.created(res, drone);
+    return ResponseUtility.success(res, drone, 201, "Drone registered successfully");
 });
 
 /** checking available drones for loading */
@@ -34,7 +34,7 @@ export const GetAvailableDrones = asyncHandler(async (req: Request, res: Respons
         },
     });
 
-    return ResponseUtility.success(res, drones);
+    return ResponseUtility.success(res, drones, 200, "Available drones retrieved successfully");
 });
 
 /** check drone battery level for a given drone */
@@ -50,7 +50,7 @@ export const CheckDroneBatteryLevel = asyncHandler(async (req: Request, res: Res
         return ResponseUtility.error(res, 404, 'Drone not found');
     }
 
-    return ResponseUtility.success(res, drone);
+    return ResponseUtility.success(res, drone, 200, "Battery level retrieved successfully");
 });
 
 /** loading a drone with medication items */
@@ -136,7 +136,7 @@ export const CheckDroneLoadedMedication = asyncHandler(async (req: Request, res:
         delivery => delivery.medications
     );
 
-    return ResponseUtility.success(res, medications);
+    return ResponseUtility.success(res, medications, 200, "Loaded medications retrieved successfully");
 });
 
 /** Out of scope functions */

@@ -147,4 +147,12 @@ export const GetAllMedications = asyncHandler(async (req: Request, res: Response
     return ResponseUtility.success(res, medications, 200, "Medications retrieved successfully");
 });
 
+export const GetUnloadedMedications = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const medications = await prisma.medication.findMany({
+        where: { deliveryId: null },
+    });
+
+    return ResponseUtility.success(res, medications, 200, "Unloaded medications retrieved successfully");
+});
+
 

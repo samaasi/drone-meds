@@ -8,15 +8,13 @@ const CRON_SCHEDULE = '*/10 * * * *';
 const BATTERY_THRESHOLD = 25;
 const MIN_BATTERY_DRAIN = 1;
 const MAX_BATTERY_DRAIN = 3;
-const BATTERY_DECIMALS = 1;
 
 let batteryCheckTask: CronTask | null = null;
 
 const getRandomDrain = (): number => {
-    const factor = 10 ** BATTERY_DECIMALS;
     return Math.round(
-        (Math.random() * (MAX_BATTERY_DRAIN - MIN_BATTERY_DRAIN) + MIN_BATTERY_DRAIN) * factor
-    ) / factor;
+        Math.random() * (MAX_BATTERY_DRAIN - MIN_BATTERY_DRAIN) + MIN_BATTERY_DRAIN
+    );
 };
 
 const logBatteryLevels = async (drones: Array<{ id: string; batteryCapacity: number }>) => {

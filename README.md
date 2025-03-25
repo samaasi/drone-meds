@@ -20,6 +20,9 @@
 - `POST /drones/:id/load` - Load a drone with medication
 - `GET /drones/:id/battery` - Get the battery level of a drone
 - `GET /drones/:id/medications` - Get the medications loaded on a drone
+- `GET /medications` - Get all medications
+- `POST /medications` - Add a new medication
+- `GET /medications/unloaded` - Get all medications that are not loaded on any drone
 
 ## Prerequisites
 - Node.js (v16+)
@@ -124,9 +127,30 @@ GET /drones/:id/battery
 > The battery level is a percentage value.
 
 ### Get the medications loaded on a drone
-```
+```curl
 GET /drones/:id/medications
 ```
 > Where `:id` is the ID of the drone to get the medications loaded (string).
 > The medications will be returned as an array of objects.
 > Each object will contain the details of the medication.
+
+### Get all medications
+```curl
+GET /medications
+```
+
+### Add a new medication
+```curl
+POST /medications
+Content-Type: application/json
+{
+  "name": "Paracetamol",}
+  "weight": 10
+  "image": "/medications/paracetamol.jpg"
+}
+```
+
+### Get all medications that are not loaded on any drone
+```curl
+GET /medications/unloaded
+```

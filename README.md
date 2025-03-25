@@ -76,6 +76,7 @@ Run the test suite:
    ```
 
 ## API Examples
+## Base URL: `http://localhost:5005/api/v1`
 
 ### Register a new drone
 ```curl

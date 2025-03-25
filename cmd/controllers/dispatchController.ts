@@ -155,4 +155,19 @@ export const GetUnloadedMedications = asyncHandler(async (req: Request, res: Res
     return ResponseUtility.success(res, medications, 200, "Unloaded medications retrieved successfully");
 });
 
+export const CreateMedication = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { name, weight, image } = req.body;
+
+    const medication = await prisma.medication.create({
+        data: {
+            name,
+            image,
+            weight,
+            code: generateMedicationCode({ name, weight })
+        }
+    });
+
+    return ResponseUtility.created(res, medication, 201, "Medication created successfully");
+});
+
 

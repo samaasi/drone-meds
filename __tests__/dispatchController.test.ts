@@ -21,7 +21,11 @@ jest.mock('../cmd/utils/prisma', () => ({
     default: {
         drone: {
             create: jest.fn(),
-            update: jest.fn(),
+            update: jest.fn().mockImplementation((args) => ({
+                ...args.data,
+                id: 'cm8l3vesl0000w7qcmq1j',
+                state: DroneState.LOADING,
+            })),
             findMany: jest.fn(),
             findUnique: jest.fn(),
         },
@@ -29,7 +33,28 @@ jest.mock('../cmd/utils/prisma', () => ({
             create: jest.fn(),
             findMany: jest.fn(),
         },
-        $transaction: jest.fn(),
+        delivery: {
+            create: jest.fn(),
+        },
+        $transaction: jest.fn().mockImplementation(async (callback) => {
+            // Create a mock transaction client
+            const txMock = {
+                drone: {
+                    update: prisma.drone.update,
+                },
+                delivery: {
+                    create: jest.fn().mockResolvedValue({
+                        id: 'cm8lzfdl10001w7js3lsyovjw',
+                        droneId: 'cm8l3vesl0000w7qcmq1j',
+                        medications: [
+                            { id: 'cm8l9knny0006w7soxbtbwq85', weight: 200 },
+                            { id: 'cm8l9knnp0005w7sovushi80h', weight: 100 }
+                        ]
+                    }),
+                },
+            };
+            return callback(txMock);
+        }),
     },
 }));
 
@@ -153,6 +178,34 @@ describe('Dispatch Controller', () => {
             expect(prisma.drone.findMany).toHaveBeenCalled();
             expect(ResponseUtility.success).toHaveBeenCalled();
         });
+    });
+
+    it('should load a drone with medications', async () => {
+        req.params = { id: 'cm8l3vesl0000w7qcmq1j' };
+        req.body = { medicationIds: ['cm8l9knny0006w7soxbtbwq85', 'cm8l9knnp0005w7sovushi80h'] };
+
+        const mockDrone = {
+            id: 'cm8l3vesl0000w7qcmq1j',
+            state: DroneState.IDLE,
+            batteryCapacity: 100,
+            weightLimit: 500
+        };
+
+        const mockMedications = [
+            { id: 'cm8l9knny0006w7soxbtbwq85', weight: 200, name: 'Paracetamol', code: 'PARAC-200mg-CAP-PHA-5FE8CA-25', image: '/medications/paracetamol.jpg' },
+            { id: 'cm8l9knnp0005w7sovushi80h', weight: 100, name: 'Ibuprofen', code: 'IBUPR-400mg-SYR-WLL-8B5168-25', image: '/medications/ibuprofen.jpg' }
+        ];
+
+        (prisma.drone.findUnique as jest.Mock).mockResolvedValue(mockDrone);
+        (prisma.medication.findMany as jest.Mock).mockResolvedValue(mockMedications);
+
+        await LoadDroneWithMedication(req as Request, res as Response, next);
+
+        expect(prisma.drone.findUnique).toHaveBeenCalled();
+        expect(prisma.medication.findMany).toHaveBeenCalled();
+        expect(prisma.$transaction).toHaveBeenCalled();
+
+        //
     });
 
     describe('CheckDroneBatteryLevel', () => {

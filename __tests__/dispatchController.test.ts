@@ -138,7 +138,7 @@ describe('Dispatch Controller', () => {
             const mockDrones = [
                 {
                     id: '1',
-                    serialNumber: 'DRONE123',
+                    serialNumber: 'DRN-ZRQAXYEBN96JNQ5',
                     model: 'Lightweight',
                     weightLimit: 500,
                     batteryCapacity: 100,
@@ -166,8 +166,21 @@ describe('Dispatch Controller', () => {
             expect(prisma.drone.findUnique).toHaveBeenCalled();
             expect(ResponseUtility.error).toHaveBeenCalledWith(res, 404, 'Drone not found');
         });
+
+        it('should return battery level if drone is found', async () => {
+            req.params = { id: 'cm8l3vesl0000w7qcmq1j' };
+
+            const mockDrone = {
+                serialNumber: 'DRN-ZRQAXYEBN96JNQ5',
+                batteryCapacity: 80
+            };
+
+            (prisma.drone.findUnique as jest.Mock).mockResolvedValue(mockDrone);
+
+            await CheckDroneBatteryLevel(req as Request, res as Response, next);
+
+            expect(prisma.drone.findUnique).toHaveBeenCalled();
+            expect(ResponseUtility.success).toHaveBeenCalledWith(res, mockDrone, 200, 'Battery level retrieved successfully');
+        });
     });
-
-    //
-
 });
